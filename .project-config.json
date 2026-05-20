@@ -1,0 +1,43 @@
+{
+  "build_command": "pnpm run build",
+  "capabilities": [
+    "server",
+    "db",
+    "user"
+  ],
+  "dev_command": "pnpm run dev",
+  "env_vars": {
+    "DATABASE_URL": "mysql://4StRPquVRAZ1XJG.9a5475a9e546:nPHE24iBG9HG1BR4QW8k@gateway06.us-east-1.prod.aws.tidbcloud.com:4000/7WfyBpRajRPJtqLMLDzUzZ?ssl={\"rejectUnauthorized\":true}"
+  },
+  "experiments": [
+    "no_db_push"
+  ],
+  "git_remote": {
+    "repo_url": "s3://vida-prod-gitrepo/webdev-git/310519663677461373/7WfyBpRajRPJtqLMLDzUzZ",
+    "access_key_id": "ASIAZV3A2ECZMOAR7QYN",
+    "secret_access_key": "1Hj4VA5FAD2ynE3Ss+E91O2OQdgg81N1WT7dXNp/",
+    "session_token": "IQoJb3JpZ2luX2VjECIaCXVzLWVhc3QtMSJGMEQCIByE3bHsHJJhaRQZIolH9WJ5psalzTgk3cZCWsi63RtkAiAvIJGOit+HG4kAcMaf66N4LZYqM3UXFn2IGZ+oFYTLKir/Awjr//////////8BEAQaDDY2NTM4NjA5ODg2NiIMEUQ32xem8bKqpnM5KtMDa0Z/gXgyMACCxmd8cuEDeK/XKnPP5AkeACn+T4XbG6xLATpG0sgkNIr2QPk7WS/IC18z5Wy1gftR7NIo+ciDy37E4kHs7X+CpEHr2Vx/yrNnK8haMhPpfiH1QmEmDBhingc3VwW6D4WyVgmv/9/mf0GPMk6dNgWvhD9RVqu5UeF7j3ZWv1YXnEHU5ZGBQIiUkLNa5BLzl6pROiz1xkS58ozdhbKMX9EcRxAdIGJ0zok284tNUv3EOiRrgM6i4kAedQARDytC+H8eTUctqcafNNz564oQNL9hHKddQ/sKQqM3ZMei4pSQ4SXzm3XtMXIm4dnxBMkRLanUy7NV/yLqR0tsZ4HBAE3zc5nKig4Hc4oIRUUNMJ0R1HJU7dS4W4KU/SlYJouwsDL/ChI5ad4+N6xuq+kqYnPhM5AGfBVEtjlA5IWj7Eeowoy1t2dkbe6AGXjy5zHcOWUFGsGEBmSiMVN1zeTyBKssLe6FkLpSsLxtcdfO9PCDEZMcrUA6odNo9sxCY5Iq1YUgVMGJBh4ygRaMvJJlEWb23GrOQPm7Uh4Oy0nDjWPRMdVAhpB0SFxCWVciN1ifSuaK4fnqXuIasbIlax1urnlzal6Ujzg3F5ypiLMwhY620AY6ngFZ9CuefzV1wYUzOTQ35pEupuIzBVAyPxEjmmDvR73QuvoeuY++o030XXppmL4/WDU8P40sabyjrqNXMe8Y/xIPO9cIX5132YDhhiFj7hdmJhfZ+EoifLc42sxTA2Gj8wWJoIkUUn5kUYT/7q8MmXPExtBvJXzOkfsKm/kJUumGvsP8iNT/6sc0LBmH71iD+jf5Ccm51r8A5p+GzN1Z3w==",
+    "expiration": "2026-05-20T22:03:49.000Z"
+  },
+  "name": "cycling-training-app",
+  "path": "/home/ubuntu/cycling-training-app",
+  "port": 3000,
+  "secrets": {
+    "BUILT_IN_FORGE_API_KEY": "QaABRbGCpMoxmToJzNFLwC",
+    "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "JWT_SECRET": "m3wBj74dhjVZMNUKTBVsE3",
+    "OAUTH_SERVER_URL": "https://api.manus.im",
+    "OWNER_NAME": "な 深",
+    "OWNER_OPEN_ID": "GoB4wQDcdZh6Pap43tbKef",
+    "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
+    "VITE_ANALYTICS_WEBSITE_ID": "49d33cc6-8ba5-409c-a584-b1d6411fd428",
+    "VITE_APP_ID": "7WfyBpRajRPJtqLMLDzUzZ",
+    "VITE_APP_LOGO": "",
+    "VITE_APP_TITLE": "CycleCoach - サイクリングトレーニング管理",
+    "VITE_FRONTEND_FORGE_API_KEY": "EX5R2RS6i68udDaygMMN46",
+    "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_OAUTH_PORTAL_URL": "https://manus.im"
+  },
+  "template_id": "web-db-user",
+  "test_command": "pnpm test"
+}
