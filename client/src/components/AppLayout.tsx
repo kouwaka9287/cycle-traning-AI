@@ -10,6 +10,8 @@ import {
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { trpc } from "@/lib/trpc";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import {
   Activity,
   Bell,
@@ -64,35 +66,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center scanlines">
-        <div className="tech-card max-w-md w-full mx-4 p-10 space-y-6">
-          <div className="text-xs font-mono text-primary tech-bracket">
-            ERR_NO_SESSION_DETECTED
-          </div>
-          <h1 className="text-3xl font-bold glitch-text uppercase tracking-tight">
-            CycleCoach
-          </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            このターミナルへのアクセスには認証が必要です。サイクルコンピューターから抽出した
-            データを解析し、トレーニング指令を発行する閉鎖型システムです。
-          </p>
-          <div className="font-mono text-[0.65rem] text-muted-foreground space-y-1">
-            <div>{"> SECURE SHELL: ENABLED"}</div>
-            <div>{"> HOST APPROVAL: REQUIRED"}</div>
-            <div className="animate-flicker">{"> AWAITING IDENTITY HANDSHAKE..."}</div>
-          </div>
-          <Button
-            onClick={() => (window.location.href = getLoginUrl())}
-            size="lg"
-            className="w-full font-mono uppercase tracking-widest"
-          >
-            <Cpu className="h-4 w-4" />
-            Initiate Login
-          </Button>
-        </div>
-      </div>
-    );
+    return <UnauthenticatedScreen />;
   }
 
   // Authenticated user but profile not registered yet
@@ -286,6 +260,110 @@ function SidebarFooter({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+    </div>
+  );
+}
+
+function UnauthenticatedScreen() {
+  const utils = trpc.useUtils();
+  const [showHost, setShowHost] = useState(false);
+  const [passphrase, setPassphrase] = useState("");
+  const hostLogin = trpc.auth.hostLogin.useMutation({
+    onSuccess: async () => {
+      toast.success("HOST AUTH OK");
+      await utils.auth.me.invalidate();
+      // Hard reload so DashboardLayout/AppLayout state is reset cleanly.
+      window.location.href = "/";
+    },
+    onError: (err) => {
+      toast.error(err.message || "HOST AUTH FAILED");
+    },
+  });
+
+  return (
+    <div className="min-h-screen flex items-center justify-center scanlines">
+      <div className="tech-card max-w-md w-full mx-4 p-10 space-y-6">
+        <div className="text-xs font-mono text-primary tech-bracket">
+          ERR_NO_SESSION_DETECTED
+        </div>
+        <h1 className="text-3xl font-bold glitch-text uppercase tracking-tight">
+          CycleCoach
+        </h1>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          このターミナルへのアクセスには認証が必要です。サイクルコンピューターから抽出した
+          データを解析し、トレーニング指令を発行する閉鎖型システムです。
+        </p>
+        <div className="font-mono text-[0.65rem] text-muted-foreground space-y-1">
+          <div>{"> SECURE SHELL: ENABLED"}</div>
+          <div>{"> HOST APPROVAL: REQUIRED"}</div>
+          <div className="animate-flicker">{"> AWAITING IDENTITY HANDSHAKE..."}</div>
+        </div>
+
+        {!showHost ? (
+          <>
+            <Button
+              onClick={() => (window.location.href = getLoginUrl())}
+              size="lg"
+              className="w-full font-mono uppercase tracking-widest"
+            >
+              <Cpu className="h-4 w-4" />
+              Initiate Login
+            </Button>
+            <button
+              type="button"
+              onClick={() => setShowHost(true)}
+              className="w-full text-[0.65rem] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+            >
+              {"> HOST DIRECT ACCESS (BYPASS_OAUTH)"}
+            </button>
+          </>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!passphrase.trim()) return;
+              hostLogin.mutate({ passphrase: passphrase.trim() });
+            }}
+            className="space-y-3"
+          >
+            <div className="text-[0.65rem] font-mono text-primary tech-bracket">
+              HOST_AUTH_TERMINAL
+            </div>
+            <Input
+              type="password"
+              autoFocus
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
+              placeholder="PASSPHRASE"
+              className="font-mono tracking-widest"
+            />
+            <p className="text-[0.6rem] font-mono text-muted-foreground leading-relaxed">
+              {"> ENTER HOST PASSPHRASE TO BYPASS OAUTH HANDSHAKE"}
+              <br />
+              {"> CONFIGURED IN: SETTINGS › SECRETS › HOST_LOGIN_PASSPHRASE"}
+            </p>
+            <Button
+              type="submit"
+              size="lg"
+              disabled={hostLogin.isPending || !passphrase.trim()}
+              className="w-full font-mono uppercase tracking-widest"
+            >
+              <Cpu className="h-4 w-4" />
+              {hostLogin.isPending ? "AUTHENTICATING..." : "ENGAGE HOST SESSION"}
+            </Button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowHost(false);
+                setPassphrase("");
+              }}
+              className="w-full text-[0.65rem] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+            >
+              {"< BACK TO STANDARD LOGIN"}
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

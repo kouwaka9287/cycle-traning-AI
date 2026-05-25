@@ -67,3 +67,7 @@
 
 ## バグ修正
 - [x] ログインができないバグの調査・修正（trust proxy、Secure強制、stateから元origin復元）
+- [ ] OAuthアカウント選択後にアプリ画面に遷移できないバグ調査・修正（Manusプレビュー内ではサードパーティCookie制限あり）
+- [x] Manusプレビュー内で動作するホスト直接ログインを実装（`auth.hostLogin` + `HOST_LOGIN_PASSPHRASE`）
+- [x] ホストログイン用セッション発行ヘルパー＆AppLayoutのログイン画面切替UIを追加
+- [x] ホストログイン回帰テスト追加（計22テスト PASS）

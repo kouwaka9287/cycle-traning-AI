@@ -7,17 +7,18 @@
   ],
   "dev_command": "pnpm run dev",
   "env_vars": {
-    "DATABASE_URL": "mysql://4StRPquVRAZ1XJG.9a5475a9e546:nPHE24iBG9HG1BR4QW8k@gateway06.us-east-1.prod.aws.tidbcloud.com:4000/7WfyBpRajRPJtqLMLDzUzZ?ssl={\"rejectUnauthorized\":true}"
+    "DATABASE_URL": "mysql://4StRPquVRAZ1XJG.9a5475a9e546:nPHE24iBG9HG1BR4QW8k@gateway06.us-east-1.prod.aws.tidbcloud.com:4000/7WfyBpRajRPJtqLMLDzUzZ?ssl={\"rejectUnauthorized\":true}",
+    "DRIZZLE_DATABASE_URL": "mysql://4StRPquVRAZ1XJG.9a5475a9e546:nPHE24iBG9HG1BR4QW8k@gateway06.us-east-1.prod.aws.tidbcloud.com:4000/7WfyBpRajRPJtqLMLDzUzZ?ssl={\"rejectUnauthorized\":true}"
   },
   "experiments": [
     "no_db_push"
   ],
   "git_remote": {
     "repo_url": "s3://vida-prod-gitrepo/webdev-git/310519663677461373/7WfyBpRajRPJtqLMLDzUzZ",
-    "access_key_id": "ASIAZV3A2ECZMOAR7QYN",
-    "secret_access_key": "1Hj4VA5FAD2ynE3Ss+E91O2OQdgg81N1WT7dXNp/",
-    "session_token": "IQoJb3JpZ2luX2VjECIaCXVzLWVhc3QtMSJGMEQCIByE3bHsHJJhaRQZIolH9WJ5psalzTgk3cZCWsi63RtkAiAvIJGOit+HG4kAcMaf66N4LZYqM3UXFn2IGZ+oFYTLKir/Awjr//////////8BEAQaDDY2NTM4NjA5ODg2NiIMEUQ32xem8bKqpnM5KtMDa0Z/gXgyMACCxmd8cuEDeK/XKnPP5AkeACn+T4XbG6xLATpG0sgkNIr2QPk7WS/IC18z5Wy1gftR7NIo+ciDy37E4kHs7X+CpEHr2Vx/yrNnK8haMhPpfiH1QmEmDBhingc3VwW6D4WyVgmv/9/mf0GPMk6dNgWvhD9RVqu5UeF7j3ZWv1YXnEHU5ZGBQIiUkLNa5BLzl6pROiz1xkS58ozdhbKMX9EcRxAdIGJ0zok284tNUv3EOiRrgM6i4kAedQARDytC+H8eTUctqcafNNz564oQNL9hHKddQ/sKQqM3ZMei4pSQ4SXzm3XtMXIm4dnxBMkRLanUy7NV/yLqR0tsZ4HBAE3zc5nKig4Hc4oIRUUNMJ0R1HJU7dS4W4KU/SlYJouwsDL/ChI5ad4+N6xuq+kqYnPhM5AGfBVEtjlA5IWj7Eeowoy1t2dkbe6AGXjy5zHcOWUFGsGEBmSiMVN1zeTyBKssLe6FkLpSsLxtcdfO9PCDEZMcrUA6odNo9sxCY5Iq1YUgVMGJBh4ygRaMvJJlEWb23GrOQPm7Uh4Oy0nDjWPRMdVAhpB0SFxCWVciN1ifSuaK4fnqXuIasbIlax1urnlzal6Ujzg3F5ypiLMwhY620AY6ngFZ9CuefzV1wYUzOTQ35pEupuIzBVAyPxEjmmDvR73QuvoeuY++o030XXppmL4/WDU8P40sabyjrqNXMe8Y/xIPO9cIX5132YDhhiFj7hdmJhfZ+EoifLc42sxTA2Gj8wWJoIkUUn5kUYT/7q8MmXPExtBvJXzOkfsKm/kJUumGvsP8iNT/6sc0LBmH71iD+jf5Ccm51r8A5p+GzN1Z3w==",
-    "expiration": "2026-05-20T22:03:49.000Z"
+    "access_key_id": "ASIAZV3A2ECZDHFYO3VL",
+    "secret_access_key": "gjNG4qzV8VSMgbetugt8Zs/DsLOWqVhWpMOgNzgt",
+    "session_token": "IQoJb3JpZ2luX2VjEJv//////////wEaCXVzLWVhc3QtMSJIMEYCIQDbNfKFRDyQiqq7mzB8LYwLeONbLJ71mZyjRTSosIW+xAIhAJY9a2jKwgfF7zoeba6VeRMbrove5I1/pcnb/OFAplbAKvYDCGQQBBoMNjY1Mzg2MDk4ODY2IgydkAqAbClm9qd8wFMq0wMFJ+I5lctCbdIl8nYcKLheHY/Qh+oqDiH/7wky4MremGzIPsm/WJo3xyc79ItxoYByDzhCmfzoWS7SOWPXnNNQ41vdXHYphNQN8eh5faWBt8bbrej6P0a3PRlhd0foE5u4iGNy8YqBHZPhEQKC3oFEz4zaGGVZy2zB1HKcD607/X3fPd6jx1O+LqVVtN3huFV8Ppxf9mVG66rCkPwbqHPsi7PzmFpt43rsf4z+RSiV4jwqAfDGsy+nXck8ZmI0i9s5JMlYaiYb3Re9msRQHU0XPUS2YM0GIG30MhOg6yyn199kp0mbP0/5s5SEjuWFkNDBT/6X40L5gTU/zJcI6P9Vd6SvWFXqDwKwLVs2Quqs3gNtsSKDfs714uKAzSBZSr6U/pI5W+5mmInjuYZ6EpvKojwqqZSSrW/1OYSLoam5LXt12RUg2WPY8Gne7D7fTKiwT6rPmsFbDUCUH78UTiOpTMB/9rWDqS0KdwBprTncOu7P2bwVVX0voiENky7JiZEdQhEVt/xtEFJJx3iL1/s80RvWDkDG1zcj6P5FGDDWiJ7maiDGZ/EEzoIIu6cImjEjPxI/pfUJk6nBsfvQrzsazEig8RXHyize/7lF5wMrsUzZHzCk0dDQBjqcAV9O7/jZShcq02kSHCVexsOY6lCGsEJvh2NTkRAj0C86DGOQkmFZWR94EAzlkB4NFU7RJwlkIpOOVjd1yVvOrHRhqJ1v3652Y9BqRbX0eZxIZPQY0Y6J+ZwL+vxVDXu8+ytD/+GLpeyhc+haDw9SHyQTOqaCHGe3c0tQs3xnqvNTcQuuc0alTY0XCU7waru9vUOvtjp5ly0lCSET7w==",
+    "expiration": "2026-05-25T22:47:00.000Z"
   },
   "name": "cycling-training-app",
   "path": "/home/ubuntu/cycling-training-app",
@@ -25,6 +26,7 @@
   "secrets": {
     "BUILT_IN_FORGE_API_KEY": "QaABRbGCpMoxmToJzNFLwC",
     "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "HOST_LOGIN_PASSPHRASE": "kouwaka123",
     "JWT_SECRET": "m3wBj74dhjVZMNUKTBVsE3",
     "OAUTH_SERVER_URL": "https://api.manus.im",
     "OWNER_NAME": "な 深",
@@ -32,7 +34,7 @@
     "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
     "VITE_ANALYTICS_WEBSITE_ID": "49d33cc6-8ba5-409c-a584-b1d6411fd428",
     "VITE_APP_ID": "7WfyBpRajRPJtqLMLDzUzZ",
-    "VITE_APP_LOGO": "",
+    "VITE_APP_LOGO": "https://files.manuscdn.com/user_upload_by_module/web_dev_logo/310519663677461373/oXZJrcQmoPlpqNAT.png",
     "VITE_APP_TITLE": "CycleCoach - サイクリングトレーニング管理",
     "VITE_FRONTEND_FORGE_API_KEY": "EX5R2RS6i68udDaygMMN46",
     "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",

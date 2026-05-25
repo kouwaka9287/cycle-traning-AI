@@ -45,6 +45,14 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  // Log every request hitting /api/oauth/* so we can confirm whether the
+  // OAuth provider successfully redirects back to our callback URL.
+  app.use("/api/oauth", (req, _res, next) => {
+    console.log(
+      `[OAuth][trace] ${req.method} ${req.originalUrl} host=${req.headers.host}`
+    );
+    next();
+  });
   registerStorageProxy(app);
   registerOAuthRoutes(app);
 
