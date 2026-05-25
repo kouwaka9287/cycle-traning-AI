@@ -39,10 +39,15 @@ export function getSessionCookieOptions(
   //       ? hostname
   //       : undefined;
 
+  // SameSite=None requires Secure. The Manus preview/prod gateways always
+  // terminate TLS, so it is safer to force Secure regardless of whether the
+  // forwarded protocol header reaches us. `isSecureRequest` is kept above as a
+  // reference for callers that may want to inspect transport state.
+  void isSecureRequest;
   return {
     httpOnly: true,
     path: "/",
     sameSite: "none",
-    secure: isSecureRequest(req),
+    secure: true,
   };
 }

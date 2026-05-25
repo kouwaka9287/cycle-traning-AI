@@ -36,15 +36,30 @@ export function registerOAuthRoutes(app: Express) {
         lastSignedIn: new Date(),
       });
 
+      // verifySession rejects empty `name` strings, so always provide a
+      // non-empty fallback even when the OAuth provider does not return one.
+      const sessionName = userInfo.name || userInfo.email || userInfo.openId;
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {
-        name: userInfo.name || "",
+        name: sessionName,
         expiresInMs: ONE_YEAR_MS,
       });
 
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
-      res.redirect(302, "/");
+      // Recover the original SPA origin from the OAuth state to redirect back
+      // to the host the user logged in from (preview vs production etc.).
+      let redirectTarget = "/";
+      try {
+        const decoded = Buffer.from(state, "base64").toString("utf-8");
+        // The frontend encodes `${origin}/api/oauth/callback` into state.
+        const parsed = new URL(decoded);
+        redirectTarget = `${parsed.origin}/`;
+      } catch {
+        // Fall back to relative root if state cannot be parsed.
+      }
+
+      res.redirect(302, redirectTarget);
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
       res.status(500).json({ error: "OAuth callback failed" });

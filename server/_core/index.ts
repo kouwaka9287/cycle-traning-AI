@@ -38,6 +38,9 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 
 async function startServer() {
   const app = express();
+  // Trust proxy so req.protocol reflects forwarded HTTPS, which is required for
+  // Secure; SameSite=None session cookies behind the Manus preview gateway.
+  app.set("trust proxy", 1);
   const server = createServer(app);
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));

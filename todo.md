@@ -64,3 +64,6 @@
 - [x] vitestテスト（解析ロジック、認証フロー、承認フロー）- 15 tests passing
 - [x] チェックポイント保存
 - [x] ユーザーへの引き渡し
+
+## バグ修正
+- [x] ログインができないバグの調査・修正（trust proxy、Secure強制、stateから元origin復元）
