@@ -1,17 +1,19 @@
 import { PageHeader } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n";
 import { trpc } from "@/lib/trpc";
 import { Loader2, Trash2, Upload } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
 export default function RideList() {
+  const { t } = useI18n();
   const utils = trpc.useUtils();
   const { data: rides, isLoading } = trpc.rides.list.useQuery({});
 
   const del = trpc.rides.delete.useMutation({
     onSuccess: async () => {
-      toast.success("削除しました");
+      toast.success(t("common.deleted"));
       await utils.rides.list.invalidate();
       await utils.analytics.summary.invalidate();
     },
@@ -21,13 +23,13 @@ export default function RideList() {
   return (
     <div>
       <PageHeader
-        title="Ride Logs"
+        title={t("rides.title")}
         code="OPS-002"
-        subtitle="アップロード済みのライドを一覧表示します。各行をクリックで詳細解析を表示。"
+        subtitle={t("rides.subtitle")}
         actions={
           <Link href="/rides/upload" asChild>
             <Button size="sm" className="font-mono uppercase tracking-widest">
-              <Upload className="h-4 w-4" /> Upload
+              <Upload className="h-4 w-4" /> {t("common.upload")}
             </Button>
           </Link>
         }
@@ -43,15 +45,15 @@ export default function RideList() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-[0.65rem] font-mono uppercase tracking-widest text-muted-foreground border-b border-border">
-                  <th className="px-3 py-2">Date</th>
-                  <th className="px-3 py-2">Title</th>
-                  <th className="px-3 py-2 text-right">Dur(min)</th>
-                  <th className="px-3 py-2 text-right">Dist(km)</th>
+                  <th className="px-3 py-2">{t("col.date")}</th>
+                  <th className="px-3 py-2">{t("col.title")}</th>
+                  <th className="px-3 py-2 text-right">{t("col.dur")}(min)</th>
+                  <th className="px-3 py-2 text-right">{t("col.dist")}(km)</th>
                   <th className="px-3 py-2 text-right">NP(W)</th>
                   <th className="px-3 py-2 text-right">IF</th>
                   <th className="px-3 py-2 text-right">TSS</th>
                   <th className="px-3 py-2 text-right">SST(min)</th>
-                  <th className="px-3 py-2 text-right">Score</th>
+                  <th className="px-3 py-2 text-right">{t("col.score")}</th>
                   <th className="px-3 py-2"></th>
                 </tr>
               </thead>
@@ -96,7 +98,7 @@ export default function RideList() {
                     <td className="px-3 py-2.5 text-right">
                       <button
                         onClick={() => {
-                          if (confirm("削除しますか?")) del.mutate({ id: r.id });
+                          if (confirm(t("common.confirmDelete"))) del.mutate({ id: r.id });
                         }}
                         className="text-muted-foreground hover:text-destructive"
                         aria-label="delete"
@@ -111,10 +113,10 @@ export default function RideList() {
           </div>
         ) : (
           <div className="py-16 text-center font-mono text-sm text-muted-foreground">
-            <div className="animate-flicker mb-4">{"> NO RIDE LOGS"}</div>
+            <div className="animate-flicker mb-4">{`> ${t("rides.empty")}`}</div>
             <Link href="/rides/upload" asChild>
               <Button size="sm" className="font-mono uppercase tracking-widest">
-                <Upload className="h-4 w-4" /> Upload First Ride
+                <Upload className="h-4 w-4" /> {t("dashboard.uploadFirst")}
               </Button>
             </Link>
           </div>

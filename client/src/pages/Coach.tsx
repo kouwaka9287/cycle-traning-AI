@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useI18n } from "@/i18n";
 import { trpc } from "@/lib/trpc";
 import { Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import { Streamdown } from "streamdown";
 import { toast } from "sonner";
 
 export default function Coach() {
+  const { t, lang } = useI18n();
   const [focus, setFocus] = useState("");
   const utils = trpc.useUtils();
 
@@ -15,7 +17,7 @@ export default function Coach() {
 
   const recommend = trpc.ai.recommend.useMutation({
     onSuccess: async () => {
-      toast.success("AI解析が完了しました");
+      toast.success(t("coach.success"));
       await utils.ai.history.invalidate();
     },
     onError: (e) => toast.error(e.message),
@@ -29,9 +31,9 @@ export default function Coach() {
   return (
     <div>
       <PageHeader
-        title="AI Coach"
+        title={t("coach.title")}
         code="OPS-005"
-        subtitle="蓄積されたライドデータ・TSS・疲労度・FTPを根拠に、AIがディストピアSF口調で次のトレーニング指令を提案します。"
+        subtitle={t("coach.subtitle")}
         actions={
           <Button
             onClick={() => recommend.mutate({ focus: focus || undefined })}
@@ -43,7 +45,7 @@ export default function Coach() {
             ) : (
               <Sparkles className="h-4 w-4" />
             )}
-            Generate Plan
+            {t("coach.generate")}
           </Button>
         }
       />
@@ -53,18 +55,18 @@ export default function Coach() {
           <div className="tech-card p-5">
             <div className="error-code mb-2">[INPUT-001]</div>
             <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-2 block">
-              Focus / 注力ポイント（任意）
+              {t("coach.focus")}
             </label>
             <Textarea
               value={focus}
               onChange={(e) => setFocus(e.target.value)}
               rows={6}
-              placeholder="例: 7月のクリテリウム向けに無酸素能力を強化したい / FTPを20W上げたい / 週末ロングライドをこなしたい など"
+              placeholder={t("coach.focusPlaceholder")}
               className="font-mono text-sm bg-input"
               maxLength={500}
             />
             <div className="text-[0.65rem] font-mono text-muted-foreground mt-2">
-              {"> 入力なしの場合は総合プランを生成します"}
+              {`> ${t("coach.focusHint")}`}
             </div>
           </div>
 
@@ -72,13 +74,13 @@ export default function Coach() {
             <div className="tech-card p-5">
               <div className="error-code mb-2">[FORM-002]</div>
               <h3 className="font-bold glitch-text-soft uppercase text-sm mb-3">
-                Form Snapshot
+                {t("coach.formSnapshot")}
               </h3>
               <div className="space-y-1.5 font-mono text-xs">
                 <Row label="CTL" value={load.ctl} />
                 <Row label="ATL" value={load.atl} />
                 <Row label="TSB" value={load.tsb} />
-                <Row label="FATIGUE" value={load.fatigueLevel} accent />
+                <Row label={t("coach.fatigue")} value={load.fatigueLevel} accent />
               </div>
             </div>
           )}
@@ -87,7 +89,7 @@ export default function Coach() {
             <div className="tech-card p-5">
               <div className="error-code mb-2">[HIST-003]</div>
               <h3 className="font-bold glitch-text-soft uppercase text-sm mb-3">
-                Past Plans
+                {t("coach.pastPlans")}
               </h3>
               <div className="space-y-2">
                 {history.slice(0, 5).map((p) => (
@@ -96,7 +98,7 @@ export default function Coach() {
                     className="border border-border/60 px-2 py-1.5 font-mono text-[0.65rem]"
                   >
                     <div className="text-muted-foreground">
-                      {new Date(p.generatedAt).toLocaleDateString("ja-JP")}
+                      {new Date(p.generatedAt).toLocaleDateString(lang === "ja" ? "ja-JP" : lang)}
                     </div>
                     <div className="truncate">
                       {p.summary || "general"} / TSB={p.tsb}
@@ -113,7 +115,7 @@ export default function Coach() {
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
               <div className="font-mono text-xs text-muted-foreground animate-flicker">
-                {"> ANALYZING TRAINING DATA..."}
+                {`> ${t("coach.analyzing")}`}
               </div>
             </div>
           ) : displayPlan ? (
@@ -130,10 +132,10 @@ export default function Coach() {
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <Sparkles className="h-10 w-10 text-primary mb-4" />
               <div className="font-mono text-sm text-muted-foreground mb-2">
-                {"> NO PLAN GENERATED"}
+                {`> ${t("coach.noPlan")}`}
               </div>
               <div className="font-mono text-xs text-muted-foreground max-w-sm">
-                右上の「Generate Plan」を押すと、現在のフォームに合わせたトレーニング指令を発行します。
+                {t("coach.noPlanHint")}
               </div>
             </div>
           )}

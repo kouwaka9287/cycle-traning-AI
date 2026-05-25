@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/AppLayout";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useI18n } from "@/i18n";
 import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -7,6 +8,7 @@ import { useMemo, useState } from "react";
 type Range = "week" | "month" | "year";
 
 export default function Stats() {
+  const { t } = useI18n();
   const [range, setRange] = useState<Range>("week");
   const { data, isLoading } = trpc.analytics.summary.useQuery({ range });
 
@@ -34,16 +36,16 @@ export default function Stats() {
   return (
     <div>
       <PageHeader
-        title="Stats"
+        title={t("stats.title")}
         code="OPS-008"
-        subtitle="週/月/年単位でトレーニングスコア・TSS・走行距離を集計します。"
+        subtitle={t("stats.subtitle")}
       />
 
       <Tabs value={range} onValueChange={(v) => setRange(v as Range)}>
         <TabsList className="mb-6 font-mono uppercase tracking-widest">
-          <TabsTrigger value="week">Week</TabsTrigger>
-          <TabsTrigger value="month">Month</TabsTrigger>
-          <TabsTrigger value="year">Year</TabsTrigger>
+          <TabsTrigger value="week">{t("stats.week")}</TabsTrigger>
+          <TabsTrigger value="month">{t("stats.month")}</TabsTrigger>
+          <TabsTrigger value="year">{t("stats.year")}</TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -54,18 +56,18 @@ export default function Stats() {
       ) : (
         <>
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-            <Stat label="RIDES" value={data.totals.rides} />
+            <Stat label={t("calendar.rides")} value={data.totals.rides} />
             <Stat
-              label="DISTANCE"
+              label={t("dashboard.distance").toUpperCase()}
               value={`${data.totals.distanceKm.toFixed(0)} km`}
             />
             <Stat
-              label="DURATION"
+              label={t("dashboard.duration").toUpperCase()}
               value={`${Math.round(data.totals.durationSec / 60)} min`}
             />
-            <Stat label="TOTAL TSS" value={Math.round(data.totals.tss)} accent />
+            <Stat label={t("stats.totalTss")} value={Math.round(data.totals.tss)} accent />
             <Stat
-              label="SCORE"
+              label={t("col.score").toUpperCase()}
               value={Math.round(data.totals.score)}
               primary
             />
@@ -74,11 +76,11 @@ export default function Stats() {
           <div className="tech-card p-6">
             <div className="error-code mb-1">[STAT-401]</div>
             <h3 className="text-base font-bold glitch-text-soft uppercase mb-5">
-              TSS Distribution
+              {t("stats.tssDistribution")}
             </h3>
             {buckets.length === 0 ? (
               <div className="text-center py-8 font-mono text-xs text-muted-foreground">
-                {"> NO DATA IN RANGE"}
+                {`> ${t("stats.noData")}`}
               </div>
             ) : (
               <div className="space-y-2">

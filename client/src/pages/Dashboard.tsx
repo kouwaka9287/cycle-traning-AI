@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n";
 import { trpc } from "@/lib/trpc";
 import {
   Activity,
@@ -15,13 +16,6 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 
-const fatigueLabel: Record<string, string> = {
-  fresh: "FRESH / ピーキング可",
-  optimal: "OPTIMAL / 練習適正",
-  elevated: "ELEVATED / 注意",
-  high: "HIGH / 要回復",
-  very_high: "VERY HIGH / 強制回復",
-};
 
 const fatigueColor: Record<string, string> = {
   fresh: "text-primary",
@@ -70,6 +64,14 @@ function MetricBox({
 }
 
 export default function Dashboard() {
+  const { t } = useI18n();
+  const fatigueLabel: Record<string, string> = {
+    fresh: t("fatigue.fresh"),
+    optimal: t("fatigue.optimal"),
+    elevated: t("fatigue.elevated"),
+    high: t("fatigue.high"),
+    very_high: t("fatigue.veryHigh"),
+  };
   const { data: summary, isLoading } = trpc.analytics.summary.useQuery({
     range: "week",
   });
@@ -78,14 +80,14 @@ export default function Dashboard() {
   return (
     <div>
       <PageHeader
-        title="Dashboard"
+        title={t("dashboard.title")}
         code="OPS-001"
-        subtitle="直近1週間のトレーニング負荷概要、フォーム指標、AIによる短期推奨を表示します。"
+        subtitle={t("dashboard.subtitle")}
         actions={
           <>
             <Link href="/rides/upload" asChild>
               <Button className="font-mono uppercase tracking-widest" size="sm">
-                <Upload className="h-4 w-4" /> Upload Ride
+                <Upload className="h-4 w-4" /> {t("dashboard.uploadRide")}
               </Button>
             </Link>
             <Link href="/coach" asChild>
@@ -94,7 +96,7 @@ export default function Dashboard() {
                 size="sm"
                 className="font-mono uppercase tracking-widest bg-background"
               >
-                <Sparkles className="h-4 w-4" /> AI Coach
+                <Sparkles className="h-4 w-4" /> {t("dashboard.aiCoach")}
               </Button>
             </Link>
           </>
@@ -103,13 +105,13 @@ export default function Dashboard() {
 
       {isLoading ? (
         <div className="text-muted-foreground font-mono text-sm flex items-center gap-2">
-          <Loader2 className="h-4 w-4 animate-spin" /> Calculating metrics...
+          <Loader2 className="h-4 w-4 animate-spin" /> {t("dashboard.calculating")}
         </div>
       ) : (
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <MetricBox
-              label="WEEK TSS"
+              label={t("dashboard.weekTss")}
               code="MTR-101"
               value={Math.round(summary?.totals.tss ?? 0)}
               unit="pts"
@@ -117,14 +119,14 @@ export default function Dashboard() {
               accent="accent"
             />
             <MetricBox
-              label="WEEK SCORE"
+              label={t("dashboard.weekScore")}
               code="MTR-102"
               value={Math.round(summary?.totals.score ?? 0)}
               unit="pts"
               icon={Award}
             />
             <MetricBox
-              label="DURATION"
+              label={t("dashboard.duration")}
               code="MTR-103"
               value={Math.round((summary?.totals.durationSec ?? 0) / 60)}
               unit="min"
@@ -132,7 +134,7 @@ export default function Dashboard() {
               accent="accent"
             />
             <MetricBox
-              label="DISTANCE"
+              label={t("dashboard.distance")}
               code="MTR-104"
               value={(Number(summary?.totals.distanceKm) || 0).toFixed(1)}
               unit="km"
@@ -147,7 +149,7 @@ export default function Dashboard() {
                 <div>
                   <div className="error-code">[LOAD-201]</div>
                   <h2 className="text-lg font-bold glitch-text-soft uppercase tracking-tight mt-1">
-                    Performance Form
+                    {t("dashboard.performanceForm")}
                   </h2>
                 </div>
                 <TrendingUp className="h-5 w-5 text-primary" />
@@ -162,7 +164,7 @@ export default function Dashboard() {
                     {summary?.load.ctl ?? "-"}
                   </div>
                   <div className="text-[0.6rem] font-mono text-muted-foreground">
-                    fitness
+                    {t("dashboard.fitness")}
                   </div>
                 </div>
                 <div>
@@ -173,7 +175,7 @@ export default function Dashboard() {
                     {summary?.load.atl ?? "-"}
                   </div>
                   <div className="text-[0.6rem] font-mono text-muted-foreground">
-                    fatigue
+                    {t("dashboard.fatigue")}
                   </div>
                 </div>
                 <div>
@@ -184,7 +186,7 @@ export default function Dashboard() {
                     {summary?.load.tsb ?? "-"}
                   </div>
                   <div className="text-[0.6rem] font-mono text-muted-foreground">
-                    form
+                    {t("dashboard.form")}
                   </div>
                 </div>
               </div>
@@ -216,7 +218,7 @@ export default function Dashboard() {
                 <div>
                   <div className="error-code">[INTNS-202]</div>
                   <h2 className="text-lg font-bold glitch-text-soft uppercase tracking-tight mt-1">
-                    Intensity Profile
+                    {t("dashboard.intensityProfile")}
                   </h2>
                 </div>
                 <Zap className="h-5 w-5 text-accent" />
@@ -224,32 +226,30 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <div className="text-[0.6rem] font-mono text-muted-foreground uppercase tracking-widest mb-1">
-                    SST TIME (week)
+                    {t("dashboard.sstTime")}
                   </div>
                   <div className="text-3xl font-bold">
                     {Math.round((summary?.totals.sstSeconds ?? 0) / 60)}
                   </div>
                   <div className="text-[0.65rem] font-mono text-muted-foreground">
-                    分 / FTP 88-94%
+                    {t("dashboard.sstHint")}
                   </div>
                 </div>
                 <div>
                   <div className="text-[0.6rem] font-mono text-muted-foreground uppercase tracking-widest mb-1">
-                    AVG IF (week)
+                    {t("dashboard.avgIf")}
                   </div>
                   <div className="text-3xl font-bold text-accent">
                     {(summary?.totals.avgIf ?? 0).toFixed(2)}
                   </div>
                   <div className="text-[0.65rem] font-mono text-muted-foreground">
-                    intensity factor
+                    {t("dashboard.intensityFactor")}
                   </div>
                 </div>
               </div>
 
               <div className="mt-6 border-t border-border pt-4 text-[0.65rem] font-mono text-muted-foreground leading-relaxed">
-                {"> SST(Sweet Spot)はFTPの88-94%帯域。"}
-                <br />
-                {"> 短時間で持久力とパワーを底上げする最高効率帯域です。"}
+                {`> ${t("dashboard.sstExplain")}`}
               </div>
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function Dashboard() {
               <div>
                 <div className="error-code">[LOG-301]</div>
                 <h2 className="text-lg font-bold glitch-text-soft uppercase tracking-tight mt-1">
-                  Recent Rides
+                  {t("dashboard.recentRides")}
                 </h2>
               </div>
               <Link href="/rides" asChild>
@@ -269,7 +269,7 @@ export default function Dashboard() {
                   size="sm"
                   className="font-mono uppercase tracking-widest bg-background"
                 >
-                  View All
+                  {t("dashboard.viewAll")}
                 </Button>
               </Link>
             </div>
@@ -279,14 +279,14 @@ export default function Dashboard() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-[0.65rem] font-mono uppercase tracking-widest text-muted-foreground border-b border-border">
-                      <th className="px-2 py-2">Date</th>
-                      <th className="px-2 py-2">Title</th>
-                      <th className="px-2 py-2 text-right">Dur</th>
-                      <th className="px-2 py-2 text-right">Dist</th>
+                      <th className="px-2 py-2">{t("col.date")}</th>
+                      <th className="px-2 py-2">{t("col.title")}</th>
+                      <th className="px-2 py-2 text-right">{t("col.dur")}</th>
+                      <th className="px-2 py-2 text-right">{t("col.dist")}</th>
                       <th className="px-2 py-2 text-right">NP</th>
                       <th className="px-2 py-2 text-right">IF</th>
                       <th className="px-2 py-2 text-right">TSS</th>
-                      <th className="px-2 py-2 text-right">Score</th>
+                      <th className="px-2 py-2 text-right">{t("col.score")}</th>
                     </tr>
                   </thead>
                   <tbody className="font-mono">
@@ -332,11 +332,11 @@ export default function Dashboard() {
             ) : (
               <div className="py-10 text-center">
                 <div className="text-muted-foreground font-mono text-sm mb-4 animate-flicker">
-                  {"> NO RIDE LOGS FOUND"}
+                  {t("dashboard.noRides")}
                 </div>
                 <Link href="/rides/upload" asChild>
                   <Button size="sm" className="font-mono uppercase tracking-widest">
-                    <Upload className="h-4 w-4" /> Upload First Ride
+                    <Upload className="h-4 w-4" /> {t("dashboard.uploadFirst")}
                   </Button>
                 </Link>
               </div>

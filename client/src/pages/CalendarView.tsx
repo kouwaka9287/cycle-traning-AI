@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n";
 import { trpc } from "@/lib/trpc";
 import {
   addMonths,
@@ -20,9 +21,10 @@ import {
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
 
-const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+const WEEKDAY_KEYS = ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu", "weekday.fri", "weekday.sat", "weekday.sun"];
 
 export default function CalendarView() {
+  const { t } = useI18n();
   const [anchor, setAnchor] = useState(() => new Date());
 
   const monthStart = startOfMonth(anchor);
@@ -81,9 +83,9 @@ export default function CalendarView() {
   return (
     <div>
       <PageHeader
-        title="Training Calendar"
+        title={t("calendar.title")}
         code="OPS-004"
-        subtitle="月単位のトレーニングログをスキャン。各日のトレーニングスコアとTSSを色強度で可視化します。"
+        subtitle={t("calendar.subtitle")}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -111,7 +113,7 @@ export default function CalendarView() {
               onClick={() => setAnchor(new Date())}
               className="bg-background font-mono uppercase tracking-widest"
             >
-              Today
+              {t("calendar.today")}
             </Button>
           </div>
         }
@@ -119,16 +121,16 @@ export default function CalendarView() {
 
       {/* Monthly totals strip */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
-        <Stat label="RIDES" value={monthlyTotals.count} />
-        <Stat label="DISTANCE" value={`${monthlyTotals.dist.toFixed(0)}km`} />
-        <Stat label="DURATION" value={`${Math.round(monthlyTotals.dur / 60)}m`} />
+        <Stat label={t("calendar.rides")} value={monthlyTotals.count} />
+        <Stat label={t("dashboard.distance").toUpperCase()} value={`${monthlyTotals.dist.toFixed(0)}km`} />
+        <Stat label={t("dashboard.duration").toUpperCase()} value={`${Math.round(monthlyTotals.dur / 60)}m`} />
         <Stat label="TSS" value={Math.round(monthlyTotals.tss)} accent />
         <Stat
           label="SST"
           value={`${Math.round(monthlyTotals.sst / 60)}m`}
         />
         <Stat
-          label="SCORE"
+          label={t("col.score").toUpperCase()}
           value={Math.round(monthlyTotals.score)}
           primary
         />
@@ -142,12 +144,12 @@ export default function CalendarView() {
           </div>
         )}
         <div className="grid grid-cols-7 gap-1 mb-2">
-          {WEEKDAYS.map((d) => (
+          {WEEKDAY_KEYS.map((k) => (
             <div
-              key={d}
+              key={k}
               className="text-[0.6rem] font-mono uppercase tracking-widest text-muted-foreground text-center py-1"
             >
-              {d}
+              {t(k)}
             </div>
           ))}
         </div>
@@ -199,18 +201,18 @@ export default function CalendarView() {
 
                 <div className="mt-1 space-y-0.5">
                   {dayRides.slice(0, 2).map((r) => (
-                    <Link key={r.id} href={`/rides/${r.id}`}>
-                      <a
-                        className="block truncate text-[0.6rem] font-mono px-1 py-0.5 bg-primary/10 border-l-2 border-primary text-foreground hover:bg-primary/20"
-                        title={r.title || r.fileName || ""}
-                      >
-                        {r.title || r.fileName || `R#${r.id}`}
-                      </a>
+                    <Link
+                      key={r.id}
+                      href={`/rides/${r.id}`}
+                      className="block truncate text-[0.6rem] font-mono px-1 py-0.5 bg-primary/10 border-l-2 border-primary text-foreground hover:bg-primary/20"
+                      title={r.title || r.fileName || ""}
+                    >
+                      {r.title || r.fileName || `R#${r.id}`}
                     </Link>
                   ))}
                   {dayRides.length > 2 && (
                     <div className="text-[0.55rem] font-mono text-muted-foreground">
-                      +{dayRides.length - 2} more
+                      +{dayRides.length - 2} {t("calendar.more")}
                     </div>
                   )}
                 </div>
@@ -228,7 +230,7 @@ export default function CalendarView() {
 
       {/* Legend */}
       <div className="mt-4 flex items-center gap-4 text-[0.65rem] font-mono text-muted-foreground">
-        <span>{"> Low TSS"}</span>
+        <span>{`> ${t("calendar.lowTss")}`}</span>
         <div className="flex gap-1">
           {[0.1, 0.3, 0.5, 0.7, 1.0].map((v, i) => (
             <div
@@ -242,7 +244,7 @@ export default function CalendarView() {
             />
           ))}
         </div>
-        <span>{"High TSS <"}</span>
+        <span>{`${t("calendar.highTss")} <`}</span>
       </div>
     </div>
   );

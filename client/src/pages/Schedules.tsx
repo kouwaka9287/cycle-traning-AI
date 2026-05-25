@@ -4,18 +4,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useI18n } from "@/i18n";
 import { trpc } from "@/lib/trpc";
 import { Bell, Loader2, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const PRESETS = [
-  { label: "毎日 朝7時にトレーニング指令", cron: "0 0 7 * * *" },
-  { label: "毎週月曜 朝8時に週次プラン", cron: "0 0 8 * * 1" },
-  { label: "毎週金曜 夜21時に休養推奨", cron: "0 0 21 * * 5" },
+const PRESET_KEYS = [
+  { labelKey: "schedules.preset.daily", cron: "0 0 7 * * *" },
+  { labelKey: "schedules.preset.weekly", cron: "0 0 8 * * 1" },
+  { labelKey: "schedules.preset.recovery", cron: "0 0 21 * * 5" },
 ];
 
 export default function Schedules() {
+  const { t, lang } = useI18n();
   const utils = trpc.useUtils();
   const { data: list, isLoading } = trpc.schedules.list.useQuery();
   const [label, setLabel] = useState("");
@@ -24,7 +26,7 @@ export default function Schedules() {
 
   const create = trpc.schedules.create.useMutation({
     onSuccess: async () => {
-      toast.success("スケジュールを作成しました");
+      toast.success(t("schedules.created"));
       setLabel("");
       setMessage("");
       await utils.schedules.list.invalidate();
@@ -41,33 +43,33 @@ export default function Schedules() {
   return (
     <div>
       <PageHeader
-        title="Schedules"
+        title={t("schedules.title")}
         code="OPS-006"
-        subtitle="トレーニング指令の自動配信スケジュールを設定します。指定した時刻にホスト宛て通知が送信されます。"
+        subtitle={t("schedules.subtitle")}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 tech-card p-6 space-y-4 self-start">
           <div className="error-code">[NEW-001]</div>
           <h3 className="font-bold glitch-text-soft uppercase text-base mb-2">
-            Add Schedule
+            {t("schedules.add")}
           </h3>
 
           <div>
             <Label className="font-mono text-xs uppercase tracking-widest">
-              Label
+              {t("schedules.label")}
             </Label>
             <Input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              placeholder="例: 朝のトレーニング指令"
+              placeholder={t("schedules.labelPlaceholder")}
               className="font-mono mt-2"
               maxLength={200}
             />
           </div>
           <div>
             <Label className="font-mono text-xs uppercase tracking-widest">
-              Cron (秒 分 時 日 月 曜日)
+              {t("schedules.cron")}
             </Label>
             <Input
               value={cron}
@@ -76,27 +78,27 @@ export default function Schedules() {
               className="font-mono mt-2"
             />
             <div className="mt-2 space-y-1">
-              {PRESETS.map((p) => (
+              {PRESET_KEYS.map((p) => (
                 <button
                   key={p.cron}
                   type="button"
                   onClick={() => setCron(p.cron)}
                   className="block w-full text-left text-[0.65rem] font-mono text-muted-foreground hover:text-primary"
                 >
-                  {`> ${p.label} [${p.cron}]`}
+                  {`> ${t(p.labelKey)} [${p.cron}]`}
                 </button>
               ))}
             </div>
           </div>
           <div>
             <Label className="font-mono text-xs uppercase tracking-widest">
-              Message（任意）
+              {t("schedules.message")}
             </Label>
             <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={3}
-              placeholder="例: 今日はSST 2x20の予定です"
+              placeholder={t("schedules.messagePlaceholder")}
               className="font-mono mt-2"
               maxLength={2000}
             />
@@ -105,7 +107,7 @@ export default function Schedules() {
           <Button
             onClick={() => {
               if (!label.trim()) {
-                toast.error("Labelを入力してください");
+                toast.error(t("schedules.labelRequired"));
                 return;
               }
               create.mutate({
@@ -122,14 +124,14 @@ export default function Schedules() {
             ) : (
               <Plus className="h-4 w-4" />
             )}
-            Create
+            {t("common.create")}
           </Button>
         </div>
 
         <div className="lg:col-span-2 tech-card p-6">
           <div className="error-code mb-1">[LIST-002]</div>
           <h3 className="font-bold glitch-text-soft uppercase text-base mb-4">
-            Active Schedules
+            {t("schedules.active")}
           </h3>
 
           {isLoading ? (
@@ -150,8 +152,8 @@ export default function Schedules() {
                       {s.cronExpression}
                       {s.lastFiredAt && (
                         <>
-                          {" / 最終実行: "}
-                          {new Date(s.lastFiredAt).toLocaleString("ja-JP")}
+                          {` / ${t("schedules.lastFired")}: `}
+                          {new Date(s.lastFiredAt).toLocaleString(lang === "ja" ? "ja-JP" : lang)}
                         </>
                       )}
                     </div>
@@ -164,7 +166,7 @@ export default function Schedules() {
                   />
                   <button
                     onClick={() => {
-                      if (confirm("削除しますか?")) del.mutate({ id: s.id });
+                      if (confirm(t("common.confirmDelete"))) del.mutate({ id: s.id });
                     }}
                     className="text-muted-foreground hover:text-destructive"
                     aria-label="delete"
@@ -176,7 +178,7 @@ export default function Schedules() {
             </div>
           ) : (
             <div className="py-10 text-center font-mono text-xs text-muted-foreground">
-              {"> NO SCHEDULES CONFIGURED"}
+              {`> ${t("schedules.empty")}`}
             </div>
           )}
         </div>

@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/i18n";
 import { trpc } from "@/lib/trpc";
 import { Loader2, Save } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -20,6 +21,7 @@ const POWER_ZONES = [
 
 export default function Profile() {
   const { user, refresh } = useAuth();
+  const { t } = useI18n();
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [ftp, setFtp] = useState("");
@@ -34,7 +36,7 @@ export default function Profile() {
 
   const update = trpc.profile.updateMetrics.useMutation({
     onSuccess: async () => {
-      toast.success("プロフィールを更新しました");
+      toast.success(t("profile.saveSuccess"));
       await refresh();
     },
     onError: (e) => toast.error(e.message),
@@ -60,9 +62,9 @@ export default function Profile() {
   return (
     <div>
       <PageHeader
-        title="Profile"
-        code="OPS-007"
-        subtitle="身体データとFTP（機能的閾値パワー）を入力すると、ライドの自動解析でTSS / IF / SST / パワーゾーンが正しく計算されます。"
+        title={t("profile.title")}
+        code={t("profile.code")}
+        subtitle={t("profile.subtitle")}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -71,14 +73,14 @@ export default function Profile() {
             <div>
               <div className="error-code mb-1">[ID-001]</div>
               <h2 className="text-lg font-bold glitch-text-soft uppercase tracking-tight">
-                Identity
+                {t("profile.identity")}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label className="font-mono text-xs uppercase tracking-widest">
-                  本名
+                  {t("profile.realName")}
                 </Label>
                 <Input
                   value={user?.realName ?? ""}
@@ -88,7 +90,7 @@ export default function Profile() {
               </div>
               <div>
                 <Label className="font-mono text-xs uppercase tracking-widest">
-                  表示名
+                  {t("profile.displayName")}
                 </Label>
                 <Input
                   value={user?.displayName ?? ""}
@@ -101,14 +103,14 @@ export default function Profile() {
             <div className="border-t border-border pt-6">
               <div className="error-code mb-1">[BIO-002]</div>
               <h2 className="text-lg font-bold glitch-text-soft uppercase tracking-tight">
-                Body Metrics
+                {t("profile.metrics")}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="height" className="font-mono text-xs uppercase tracking-widest">
-                  身長 (cm)
+                  {t("profile.height")}
                 </Label>
                 <Input
                   id="height"
@@ -123,7 +125,7 @@ export default function Profile() {
               </div>
               <div>
                 <Label htmlFor="weight" className="font-mono text-xs uppercase tracking-widest">
-                  体重 (kg)
+                  {t("profile.weight")}
                 </Label>
                 <Input
                   id="weight"
@@ -138,7 +140,7 @@ export default function Profile() {
               </div>
               <div>
                 <Label htmlFor="ftp" className="font-mono text-xs uppercase tracking-widest">
-                  FTP (W)
+                  {t("profile.ftp")}
                 </Label>
                 <Input
                   id="ftp"
@@ -153,8 +155,7 @@ export default function Profile() {
             </div>
 
             <div className="bg-secondary/30 border border-border p-4 font-mono text-[0.7rem] text-muted-foreground space-y-1">
-              <div>{"> FTPは1時間維持できる平均パワー。20分テスト平均×0.95でも代用可。"}</div>
-              <div>{"> 最新FTPを保存すると、以降のライドアップロード時にゾーン計算へ反映されます。"}</div>
+              <div>{`> ${t("profile.ftpHint")}`}</div>
             </div>
 
             <Button
@@ -167,7 +168,7 @@ export default function Profile() {
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              Save Profile
+              {update.isPending ? t("common.saving") : t("common.save")}
             </Button>
           </form>
         </div>
@@ -176,7 +177,7 @@ export default function Profile() {
         <div className="tech-card p-6">
           <div className="error-code mb-1">[ZONE-003]</div>
           <h2 className="text-lg font-bold glitch-text-soft uppercase tracking-tight mb-4">
-            Power Zones
+            {t("profile.zonesTitle")}
           </h2>
           {ftpNum > 0 ? (
             <>
@@ -210,7 +211,7 @@ export default function Profile() {
             </>
           ) : (
             <div className="py-8 text-center font-mono text-xs text-muted-foreground animate-flicker">
-              {"> ENTER FTP TO COMPUTE ZONES"}
+              {t("profile.zonesEmpty")}
             </div>
           )}
         </div>

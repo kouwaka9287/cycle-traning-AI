@@ -29,9 +29,11 @@ import {
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "./ui/button";
+import { useI18n, type TranslationKey } from "@/i18n";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 type NavItem = {
-  label: string;
+  labelKey: TranslationKey;
   path: string;
   icon: React.ComponentType<{ className?: string }>;
   code: string;
@@ -39,14 +41,14 @@ type NavItem = {
 };
 
 const NAV: NavItem[] = [
-  { label: "DASHBOARD", path: "/", icon: LayoutDashboard, code: "OPS-001" },
-  { label: "RIDES", path: "/rides", icon: Activity, code: "OPS-002" },
-  { label: "UPLOAD", path: "/rides/upload", icon: Upload, code: "OPS-003" },
-  { label: "CALENDAR", path: "/calendar", icon: CalendarDays, code: "OPS-004" },
-  { label: "AI COACH", path: "/coach", icon: Sparkles, code: "OPS-005" },
-  { label: "SCHEDULES", path: "/schedules", icon: Bell, code: "OPS-006" },
-  { label: "PROFILE", path: "/profile", icon: Settings, code: "OPS-007" },
-  { label: "ADMIN", path: "/admin", icon: ShieldCheck, code: "ADM-000", adminOnly: true },
+  { labelKey: "nav.dashboard", path: "/", icon: LayoutDashboard, code: "OPS-001" },
+  { labelKey: "nav.rides", path: "/rides", icon: Activity, code: "OPS-002" },
+  { labelKey: "nav.upload", path: "/rides/upload", icon: Upload, code: "OPS-003" },
+  { labelKey: "nav.calendar", path: "/calendar", icon: CalendarDays, code: "OPS-004" },
+  { labelKey: "nav.coach", path: "/coach", icon: Sparkles, code: "OPS-005" },
+  { labelKey: "nav.schedules", path: "/schedules", icon: Bell, code: "OPS-006" },
+  { labelKey: "nav.profile", path: "/profile", icon: Settings, code: "OPS-007" },
+  { labelKey: "nav.admin", path: "/admin", icon: ShieldCheck, code: "ADM-000", adminOnly: true },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -54,6 +56,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const isMobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useI18n();
 
   if (loading) {
     return (
@@ -120,7 +123,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <div className="flex items-center gap-3">
                     <Icon className="h-4 w-4" />
                     <span className="font-mono uppercase tracking-wider text-xs">
-                      {item.label}
+                      {t(item.labelKey)}
                     </span>
                   </div>
                   <div className="text-[0.6rem] font-mono text-muted-foreground/50 mt-0.5 ml-7">
@@ -130,6 +133,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
+          <div className="px-3 pb-2">
+            <LanguageSwitcher />
+          </div>
           <SidebarFooter user={user} onLogout={logout} />
         </aside>
       )}
@@ -173,7 +179,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <div className="flex items-center gap-3">
                     <Icon className="h-4 w-4" />
                     <span className="font-mono uppercase tracking-wider text-xs">
-                      {item.label}
+                      {t(item.labelKey)}
                     </span>
                   </div>
                 </Link>
@@ -184,7 +190,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 onClick={logout}
                 className="w-full text-left px-3 py-2 text-sm text-destructive flex items-center gap-3 font-mono"
               >
-                <LogOut className="h-4 w-4" /> SIGN OUT
+                <LogOut className="h-4 w-4" /> {t("common.signOut").toUpperCase()}
               </button>
             </div>
           </nav>
@@ -225,6 +231,7 @@ function SidebarFooter({
   user: { displayName?: string | null; name?: string | null; email?: string | null; role: string };
   onLogout: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="border-t border-border/60 p-3">
       <DropdownMenu>
@@ -248,7 +255,7 @@ function SidebarFooter({
         <DropdownMenuContent align="start" className="w-52">
           <DropdownMenuItem asChild>
             <Link href="/profile" className="flex items-center gap-2 w-full">
-              <Settings className="h-4 w-4" /> プロフィール設定
+              <Settings className="h-4 w-4" /> {t("nav.profile")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -256,7 +263,7 @@ function SidebarFooter({
             onClick={onLogout}
             className="text-destructive focus:text-destructive"
           >
-            <LogOut className="h-4 w-4 mr-2" /> Sign Out
+            <LogOut className="h-4 w-4 mr-2" /> {t("common.signOut")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -266,6 +273,7 @@ function SidebarFooter({
 
 function UnauthenticatedScreen() {
   const utils = trpc.useUtils();
+  const { t } = useI18n();
   const [showHost, setShowHost] = useState(false);
   const [passphrase, setPassphrase] = useState("");
   const hostLogin = trpc.auth.hostLogin.useMutation({
@@ -276,27 +284,29 @@ function UnauthenticatedScreen() {
       window.location.href = "/";
     },
     onError: (err) => {
-      toast.error(err.message || "HOST AUTH FAILED");
+      toast.error(err.message || t("auth.hostFailed"));
     },
   });
 
   return (
     <div className="min-h-screen flex items-center justify-center scanlines">
       <div className="tech-card max-w-md w-full mx-4 p-10 space-y-6">
-        <div className="text-xs font-mono text-primary tech-bracket">
-          ERR_NO_SESSION_DETECTED
+        <div className="flex items-center justify-between">
+          <div className="text-xs font-mono text-primary tech-bracket">
+            ERR_NO_SESSION_DETECTED
+          </div>
+          <LanguageSwitcher compact />
         </div>
         <h1 className="text-3xl font-bold glitch-text uppercase tracking-tight">
           CycleCoach
         </h1>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          このターミナルへのアクセスには認証が必要です。サイクルコンピューターから抽出した
-          データを解析し、トレーニング指令を発行する閉鎖型システムです。
+          {t("auth.lead")}
         </p>
         <div className="font-mono text-[0.65rem] text-muted-foreground space-y-1">
-          <div>{"> SECURE SHELL: ENABLED"}</div>
-          <div>{"> HOST APPROVAL: REQUIRED"}</div>
-          <div className="animate-flicker">{"> AWAITING IDENTITY HANDSHAKE..."}</div>
+          <div>{t("auth.shellEnabled")}</div>
+          <div>{t("auth.hostApprovalRequired")}</div>
+          <div className="animate-flicker">{t("auth.awaitingHandshake")}</div>
         </div>
 
         {!showHost ? (
@@ -307,14 +317,14 @@ function UnauthenticatedScreen() {
               className="w-full font-mono uppercase tracking-widest"
             >
               <Cpu className="h-4 w-4" />
-              Initiate Login
+              {t("auth.initiateLogin")}
             </Button>
             <button
               type="button"
               onClick={() => setShowHost(true)}
               className="w-full text-[0.65rem] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
             >
-              {"> HOST DIRECT ACCESS (BYPASS_OAUTH)"}
+              {t("auth.hostBypassToggle")}
             </button>
           </>
         ) : (
@@ -327,20 +337,21 @@ function UnauthenticatedScreen() {
             className="space-y-3"
           >
             <div className="text-[0.65rem] font-mono text-primary tech-bracket">
-              HOST_AUTH_TERMINAL
+              {t("auth.hostPanelTitle")}
             </div>
+            <p className="text-[0.65rem] font-mono text-muted-foreground leading-relaxed">
+              {t("auth.hostPanelLead")}
+            </p>
             <Input
               type="password"
               autoFocus
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
-              placeholder="PASSPHRASE"
+              placeholder={t("auth.hostPassphrase")}
               className="font-mono tracking-widest"
             />
             <p className="text-[0.6rem] font-mono text-muted-foreground leading-relaxed">
-              {"> ENTER HOST PASSPHRASE TO BYPASS OAUTH HANDSHAKE"}
-              <br />
-              {"> CONFIGURED IN: SETTINGS › SECRETS › HOST_LOGIN_PASSPHRASE"}
+              {t("auth.hostHint")}
             </p>
             <Button
               type="submit"
@@ -349,7 +360,7 @@ function UnauthenticatedScreen() {
               className="w-full font-mono uppercase tracking-widest"
             >
               <Cpu className="h-4 w-4" />
-              {hostLogin.isPending ? "AUTHENTICATING..." : "ENGAGE HOST SESSION"}
+              {hostLogin.isPending ? t("auth.engaging") : t("auth.engageHost")}
             </Button>
             <button
               type="button"
@@ -359,7 +370,7 @@ function UnauthenticatedScreen() {
               }}
               className="w-full text-[0.65rem] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
             >
-              {"< BACK TO STANDARD LOGIN"}
+              {t("auth.cancelHost")}
             </button>
           </form>
         )}

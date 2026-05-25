@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Download, Loader2 } from "lucide-react";
 import { Link, useRoute } from "wouter";
@@ -49,6 +50,7 @@ function MetricItem({
 }
 
 export default function RideDetail() {
+  const { t, lang } = useI18n();
   const [, params] = useRoute<{ id: string }>("/rides/:id");
   const id = Number(params?.id);
   const { data: ride, isLoading } = trpc.rides.detail.useQuery(
@@ -78,13 +80,13 @@ export default function RideDetail() {
         href="/rides"
         className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary mb-4"
       >
-        <ArrowLeft className="h-3 w-3" /> Back to Rides
+        <ArrowLeft className="h-3 w-3" /> {t("rideDetail.backToRides")}
       </Link>
 
       <PageHeader
         title={ride.title || ride.fileName || `Ride #${ride.id}`}
         code={`RIDE-${String(ride.id).padStart(4, "0")}`}
-        subtitle={`${new Date(ride.rideDate).toLocaleString("ja-JP")} / source: ${ride.source}`}
+        subtitle={`${new Date(ride.rideDate).toLocaleString(lang === "ja" ? "ja-JP" : lang)} / source: ${ride.source}`}
         actions={
           <DownloadButton id={ride.id} />
         }
@@ -92,26 +94,26 @@ export default function RideDetail() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
         <MetricItem
-          label="DURATION"
+          label={t("dashboard.duration").toUpperCase()}
           value={Math.round((ride.durationSec ?? 0) / 60)}
           unit="min"
         />
         <MetricItem
-          label="DISTANCE"
+          label={t("dashboard.distance").toUpperCase()}
           value={Number(ride.distanceKm).toFixed(1)}
           unit="km"
         />
-        <MetricItem label="ELEV GAIN" value={ride.elevationM} unit="m" />
+        <MetricItem label={t("rideDetail.elevGain")} value={ride.elevationM} unit="m" />
         <MetricItem
-          label="AVG SPEED"
+          label={t("rideDetail.avgSpeed")}
           value={
             ride.avgSpeedKph != null ? Number(ride.avgSpeedKph).toFixed(1) : "-"
           }
           unit="kph"
         />
-        <MetricItem label="ENERGY" value={ride.kj} unit="kJ" />
+        <MetricItem label={t("rideDetail.energy")} value={ride.kj} unit="kJ" />
         <MetricItem
-          label="FTP USED"
+          label={t("rideDetail.ftpUsed")}
           value={ride.ftpUsed}
           unit="W"
         />
@@ -121,19 +123,19 @@ export default function RideDetail() {
         <div className="tech-card p-6">
           <div className="error-code mb-1">[POW-101]</div>
           <h3 className="text-base font-bold glitch-text-soft uppercase mb-4">
-            Power
+            {t("rideDetail.power")}
           </h3>
           <div className="space-y-3 font-mono text-sm">
-            <Row label="Avg Power" value={ride.avgPower} unit="W" />
+            <Row label={t("rideDetail.avgPower")} value={ride.avgPower} unit="W" />
             <Row
-              label="Normalized Power"
+              label={t("rideDetail.np")}
               value={ride.normalizedPower}
               unit="W"
               accent
             />
-            <Row label="Max Power" value={ride.maxPower} unit="W" />
+            <Row label={t("rideDetail.maxPower")} value={ride.maxPower} unit="W" />
             <Row
-              label="Intensity Factor"
+              label={t("rideDetail.if")}
               value={ride.intensityFactor}
               accent
             />
@@ -143,30 +145,30 @@ export default function RideDetail() {
         <div className="tech-card p-6">
           <div className="error-code mb-1">[BIO-102]</div>
           <h3 className="text-base font-bold glitch-text-soft uppercase mb-4">
-            Bio
+            {t("rideDetail.bio")}
           </h3>
           <div className="space-y-3 font-mono text-sm">
-            <Row label="Avg HR" value={ride.avgHr} unit="bpm" />
-            <Row label="Max HR" value={ride.maxHr} unit="bpm" />
-            <Row label="Avg Cadence" value={ride.avgCadence} unit="rpm" />
+            <Row label={t("rideDetail.avgHr")} value={ride.avgHr} unit="bpm" />
+            <Row label={t("rideDetail.maxHr")} value={ride.maxHr} unit="bpm" />
+            <Row label={t("rideDetail.avgCadence")} value={ride.avgCadence} unit="rpm" />
           </div>
         </div>
 
         <div className="tech-card p-6 border-primary/30">
           <div className="error-code mb-1">[LOAD-103]</div>
           <h3 className="text-base font-bold glitch-text-soft uppercase mb-4">
-            Training Load
+            {t("rideDetail.trainingLoad")}
           </h3>
           <div className="space-y-3 font-mono text-sm">
             <Row label="TSS" value={ride.tss} accent unit="pts" />
             <Row
-              label="SST Time"
+              label={t("rideDetail.sstTime")}
               value={Math.round((ride.sstSeconds ?? 0) / 60)}
               unit="min"
             />
             <div className="pt-3 border-t border-border">
               <div className="text-[0.65rem] uppercase tracking-widest text-muted-foreground mb-1">
-                Training Score
+                {t("rideDetail.trainingScore")}
               </div>
               <div className="text-3xl font-bold text-primary glitch-text-soft">
                 {ride.trainingScore ?? 0}
@@ -182,7 +184,7 @@ export default function RideDetail() {
         <div className="tech-card p-6 mb-6">
           <div className="error-code mb-1">[ZONE-201]</div>
           <h3 className="text-base font-bold glitch-text-soft uppercase mb-5">
-            Power Zone Distribution
+            {t("rideDetail.zoneDistribution")}
           </h3>
           <div className="space-y-2.5">
             {ZONE_NAMES.map((name, i) => {
@@ -214,7 +216,7 @@ export default function RideDetail() {
         <div className="tech-card p-6">
           <div className="error-code mb-1">[NOTE-301]</div>
           <h3 className="text-base font-bold glitch-text-soft uppercase mb-3">
-            Notes
+            {t("rideDetail.notes")}
           </h3>
           <p className="font-mono text-sm whitespace-pre-wrap text-muted-foreground">
             {ride.notes}
@@ -256,6 +258,7 @@ function Row({
 }
 
 function DownloadButton({ id }: { id: number }) {
+  const { t } = useI18n();
   const utils = trpc.useUtils();
   const handleClick = async () => {
     try {
@@ -273,7 +276,7 @@ function DownloadButton({ id }: { id: number }) {
       className="font-mono uppercase tracking-widest bg-background"
     >
       <Download className="h-4 w-4" />
-      Original
+      {t("rideDetail.original")}
     </Button>
   );
 }
