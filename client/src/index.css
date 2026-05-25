@@ -40,85 +40,85 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --color-cyan: oklch(0.85 0.18 200);
+  --color-magenta: oklch(0.65 0.28 340);
 }
 
 :root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --radius: 0.65rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.235 0.015 65);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.015 65);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.015 65);
-  --secondary: oklch(0.98 0.001 286.375);
-  --secondary-foreground: oklch(0.4 0.015 65);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.141 0.005 285.823);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.623 0.214 259.815);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.235 0.015 65);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.623 0.214 259.815);
-}
-
-.dark {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.85 0.005 65);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.85 0.005 65);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.85 0.005 65);
-  --secondary: oklch(0.24 0.006 286.033);
-  --secondary-foreground: oklch(0.7 0.005 65);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.488 0.243 264.376);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.85 0.005 65);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.488 0.243 264.376);
+  --radius: 0.125rem;
+  /* Retro-futuristic dystopian palette - deep black + neon accents */
+  --background: oklch(0.08 0.005 240);
+  --foreground: oklch(0.96 0.005 240);
+  --card: oklch(0.12 0.008 240);
+  --card-foreground: oklch(0.96 0.005 240);
+  --popover: oklch(0.10 0.008 240);
+  --popover-foreground: oklch(0.96 0.005 240);
+  --primary: oklch(0.85 0.18 200);
+  --primary-foreground: oklch(0.08 0.005 240);
+  --secondary: oklch(0.18 0.008 240);
+  --secondary-foreground: oklch(0.92 0.005 240);
+  --muted: oklch(0.16 0.005 240);
+  --muted-foreground: oklch(0.65 0.01 240);
+  --accent: oklch(0.65 0.28 340);
+  --accent-foreground: oklch(0.08 0.005 240);
+  --destructive: oklch(0.65 0.28 30);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.25 0.01 240);
+  --input: oklch(0.18 0.008 240);
+  --ring: oklch(0.85 0.18 200);
+  --chart-1: oklch(0.85 0.18 200);
+  --chart-2: oklch(0.65 0.28 340);
+  --chart-3: oklch(0.78 0.18 90);
+  --chart-4: oklch(0.70 0.20 30);
+  --chart-5: oklch(0.65 0.15 270);
+  --sidebar: oklch(0.06 0.005 240);
+  --sidebar-foreground: oklch(0.92 0.005 240);
+  --sidebar-primary: oklch(0.85 0.18 200);
+  --sidebar-primary-foreground: oklch(0.08 0.005 240);
+  --sidebar-accent: oklch(0.16 0.008 240);
+  --sidebar-accent-foreground: oklch(0.96 0.005 240);
+  --sidebar-border: oklch(0.20 0.008 240);
+  --sidebar-ring: oklch(0.85 0.18 200);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html, body {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        oklch(1 0 0 / 0.02) 2px,
+        oklch(1 0 0 / 0.02) 3px
+      ),
+      radial-gradient(ellipse at top, oklch(0.12 0.02 200 / 0.4), transparent 50%),
+      radial-gradient(ellipse at bottom, oklch(0.10 0.04 340 / 0.3), transparent 50%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      oklch(0 0 0 / 0.15) 3px,
+      oklch(0 0 0 / 0.15) 4px
+    );
+    mix-blend-mode: multiply;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -131,27 +131,17 @@
   input[type="radio"]:not(:disabled) {
     @apply cursor-pointer;
   }
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
 }
 
 @layer components {
-  /**
-   * Custom container utility that centers content and adds responsive padding.
-   *
-   * This overrides Tailwind's default container behavior to:
-   * - Auto-center content (mx-auto)
-   * - Add responsive horizontal padding
-   * - Set max-width for large screens
-   *
-   * Usage: <div className="container">...</div>
-   *
-   * For custom widths, use max-w-* utilities directly:
-   * <div className="max-w-6xl mx-auto px-4">...</div>
-   */
   .container {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1rem; /* 16px - mobile padding */
+    padding-left: 1rem;
     padding-right: 1rem;
   }
 
@@ -162,16 +152,124 @@
 
   @media (min-width: 640px) {
     .container {
-      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-left: 1.5rem;
       padding-right: 1.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .container {
-      padding-left: 2rem; /* 32px - desktop padding */
+      padding-left: 2rem;
       padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
+      max-width: 1280px;
     }
   }
+
+  /* Glitch / chromatic aberration effect for headings */
+  .glitch-text {
+    position: relative;
+    color: oklch(0.96 0.005 240);
+    text-shadow:
+      -0.04em 0 0 oklch(0.85 0.18 200 / 0.85),
+      0.04em 0 0 oklch(0.65 0.28 340 / 0.85);
+    letter-spacing: 0.01em;
+  }
+
+  .glitch-text-soft {
+    text-shadow:
+      -0.02em 0 0 oklch(0.85 0.18 200 / 0.65),
+      0.02em 0 0 oklch(0.65 0.28 340 / 0.65);
+  }
+
+  /* Bracket decoration */
+  .tech-bracket::before {
+    content: "[";
+    color: oklch(0.85 0.18 200);
+    margin-right: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    opacity: 0.8;
+  }
+  .tech-bracket::after {
+    content: "]";
+    color: oklch(0.65 0.28 340);
+    margin-left: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    opacity: 0.8;
+  }
+
+  /* Scanline overlay for hero sections */
+  .scanlines {
+    position: relative;
+  }
+  .scanlines::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      oklch(0.85 0.18 200 / 0.04) 2px,
+      oklch(0.85 0.18 200 / 0.04) 3px
+    );
+  }
+
+  /* Tech card with subtle border glow */
+  .tech-card {
+    background: linear-gradient(135deg, oklch(0.12 0.008 240 / 0.9), oklch(0.10 0.012 240 / 0.85));
+    border: 1px solid oklch(0.25 0.01 240);
+    position: relative;
+  }
+  .tech-card::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 8px;
+    height: 8px;
+    border-top: 1px solid oklch(0.85 0.18 200);
+    border-left: 1px solid oklch(0.85 0.18 200);
+    pointer-events: none;
+  }
+  .tech-card::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 8px;
+    height: 8px;
+    border-bottom: 1px solid oklch(0.65 0.28 340);
+    border-right: 1px solid oklch(0.65 0.28 340);
+    pointer-events: none;
+  }
+
+  /* Error/code text */
+  .error-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: oklch(0.55 0.18 200);
+  }
+
+  /* Make sure z-index for content sits above scanlines */
+  #root {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  41.99% { opacity: 1; }
+  42% { opacity: 0.85; }
+  43% { opacity: 1; }
+  47.99% { opacity: 1; }
+  48% { opacity: 0.92; }
+  49% { opacity: 1; }
+}
+
+.animate-flicker {
+  animation: flicker 6s infinite;
 }
