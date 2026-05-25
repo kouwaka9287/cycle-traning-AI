@@ -73,7 +73,7 @@ export default function RideUpload() {
       <PageHeader
         title="Upload Ride"
         code="OPS-003"
-        subtitle="サイクルコンピューターからエクスポートしたCSVまたはFITファイルをインポートします。CSVは時間/パワー/心拍/ケイデンス列を自動検出します。"
+        subtitle="Garmin / Wahoo / Polar / Hammerhead などのサイクルコンピューターから出力された .FIT ファイルをそのままインポートします。パワー/心拍/ケイデンス/GPS/高度/温度を完全解析します。"
       />
 
       <form
@@ -120,7 +120,7 @@ export default function RideUpload() {
                     Drop or Click
                   </div>
                   <div className="font-mono text-xs text-muted-foreground">
-                    {"> Supported: CSV / FIT / TXT"}
+                    {"> Primary: .FIT  ·  Legacy: .CSV / .TXT"}
                   </div>
                 </>
               )}
@@ -191,24 +191,27 @@ export default function RideUpload() {
           </h3>
           <div className="space-y-3 font-mono text-[0.75rem] text-muted-foreground leading-relaxed">
             <div>
-              <div className="text-foreground mb-1">{"> CSV"}</div>
-              ヘッダ行に <span className="text-primary">time</span>{" "}
-              または <span className="text-primary">timestamp</span>、{" "}
+              <div className="text-foreground mb-1">{"> .FIT (推奨)"}</div>
+              サイクルコンピューターから　そのまま出力した .FIT ファイルをアップロードしてください。
               <span className="text-primary">power</span>,{" "}
-              <span className="text-primary">hr</span>,{" "}
+              <span className="text-primary">heart_rate</span>,{" "}
               <span className="text-primary">cadence</span>,{" "}
-              <span className="text-primary">distance</span>,{" "}
-              <span className="text-primary">altitude</span>{" "}
-              を含めてください。
+              <span className="text-primary">enhanced_speed</span>,{" "}
+              <span className="text-primary">enhanced_altitude</span>,{" "}
+              <span className="text-primary">position_lat/long</span>,{" "}
+              <span className="text-primary">temperature</span>{" "}
+              をデビイス同梱データと同じ精度で取り込みます。Garmin Connect / Wahoo / TrainingPeaks 、いずれのエクスポートもそのまま使えます。
             </div>
             <div>
-              <div className="text-foreground mb-1">{"> FIT"}</div>
-              バイナリ形式は基本対応ですが、互換性問題が起きた場合はGarmin Connect等でCSVに書き出してください。
+              <div className="text-foreground mb-1">{"> .CSV (レガシー)"}</div>
+              .FIT が入手できない場合のみ、ヘッダ行に{" "}
+              <span className="text-primary">time</span>/<span className="text-primary">timestamp</span>{" "}
+              と <span className="text-primary">power</span> を含むCSVも受け付けます。
             </div>
             <div className="border-t border-border pt-3 flex items-start gap-2">
               <FileText className="h-3 w-3 mt-0.5 shrink-0" />
               <div>
-                FTPが未設定の場合、TSS/IF/ゾーン分析が無効になります。
+                FTPが未設定の場合、TSS/IF/パワーゾーン分析が無効になります。
               </div>
             </div>
           </div>

@@ -111,31 +111,59 @@ export const rideRouter = router({
         });
       }
 
-      const samples = analysis.parseRideFile(input.fileName, buf);
+      let parsed: analysis.ParsedRide;
+      try {
+        parsed = await analysis.parseRideFile(input.fileName, buf);
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `FITファイルの解析に失敗しました (${detail})`,
+        });
+      }
+      const { samples, fit: fitCtx } = parsed;
+
       if (samples.t.length === 0) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message:
-            isFit
-              ? "FITファイルの自動解析に失敗しました。CSV書き出しを使用してください"
-              : "CSVから有効なライドデータを抽出できませんでした",
+          message: isFit
+            ? "FITファイル内に記録(record)メッセージが見つかりませんでした。GPS/パワー記録が有効か確認してください"
+            : "CSVから有効なライドデータを抽出できませんでした",
         });
       }
 
       const ftp = ctx.user.ftp ?? null;
       const metrics = analysis.computeRideMetrics(samples, ftp);
 
+      // Prefer device-reported totals when available (FIT session message).
+      if (fitCtx) {
+        if (fitCtx.deviceTotalDistanceM && metrics.distanceKm < 0.01) {
+          metrics.distanceKm = +(fitCtx.deviceTotalDistanceM / 1000).toFixed(3);
+        }
+        if (fitCtx.deviceTotalAscentM && metrics.elevationM === 0) {
+          metrics.elevationM = Math.round(fitCtx.deviceTotalAscentM);
+        }
+        if (fitCtx.totalTimerSec && metrics.durationSec === 0) {
+          metrics.durationSec = Math.round(fitCtx.totalTimerSec);
+        }
+      }
+
       const rideDate =
         input.rideDate ??
-        (samples.startTimeMs ? new Date(samples.startTimeMs) : new Date());
+        (fitCtx?.startTimeMs
+          ? new Date(fitCtx.startTimeMs)
+          : samples.startTimeMs
+            ? new Date(samples.startTimeMs)
+            : new Date());
 
-      // Persist original to storage
+      // Persist original to storage - FIT bytes are kept verbatim so we can
+      // re-analyse rides later when FTP / algorithms change.
       const safeName = input.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
       const rel = `rides/${ctx.user.id}/${rideDate.getTime()}_${safeName}`;
       const { key } = await storagePut(
         rel,
         buf,
-        isCsv ? "text/csv" : "application/octet-stream",
+        isCsv ? "text/csv" : "application/vnd.ant.fit",
       );
 
       const id = await db.insertRide({

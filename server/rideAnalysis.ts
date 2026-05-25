@@ -1,13 +1,17 @@
 /**
  * Ride file parsing and metric calculation.
  *
- * Supports:
- * - CSV with at minimum a "time" or "seconds" column plus "power" (watts).
- *   Optional columns: hr, heart_rate, cadence, speed, distance, altitude.
- * - FIT files: a permissive minimal parser that scans the binary record for
- *   common fields. Real FIT files are complex; for robustness we recommend CSV
- *   exports, but this parser handles a useful subset.
+ * Primary format: .FIT (Garmin / Wahoo / Polar / Hammerhead etc.).
+ *   - Decoded via `fit-file-parser` to extract record / session / lap / sport
+ *     messages with full field fidelity (power, hr, cadence, enhanced_speed,
+ *     enhanced_altitude, distance, position_lat/long, temperature, timestamp).
+ *
+ * Legacy format: .CSV / .TXT with at minimum a "time" or "seconds" column plus
+ *   "power" (watts). Optional columns: hr, heart_rate, cadence, speed,
+ *   distance, altitude.
  */
+
+import FitParser from "fit-file-parser";
 
 export type RideSamples = {
   /** seconds elapsed from start of ride */
@@ -18,6 +22,12 @@ export type RideSamples = {
   speedMps: (number | null)[];
   distanceM: (number | null)[];
   altitudeM: (number | null)[];
+  /** GPS latitude in degrees (FIT only). */
+  latDeg?: (number | null)[];
+  /** GPS longitude in degrees (FIT only). */
+  lonDeg?: (number | null)[];
+  /** Sensor temperature in °C (FIT only). */
+  temperatureC?: (number | null)[];
   startTimeMs?: number;
 };
 
@@ -133,16 +143,78 @@ function safeFloat(v: string | undefined): number | null {
 }
 
 /**
- * Permissive FIT parser - decodes record messages with basic global IDs.
- * Returns a sparse RideSamples; if parsing fails completely, returns empty.
+ * Parsed FIT context that we return alongside the samples so callers can
+ * surface device, sport, and session-level metadata.
  */
-function parseFit(buf: Buffer): RideSamples {
-  // FIT files have a 12 or 14 byte header + records + 2 byte CRC.
-  // This is a very simplified scanner that looks for likely power/HR cadence
-  // numeric arrays. For robustness we fall back to estimating from known
-  // patterns. Most real FIT files include a "record" message (global #20).
-  // We do not implement full decoding here; instead, if the file is binary
-  // FIT, we extract integer pairs and approximate samples by stride.
+export type FitContext = {
+  sport?: string | null;
+  subSport?: string | null;
+  device?: string | null;
+  startTimeMs?: number;
+  /** Sum of `total_timer_time` from session messages (active moving seconds). */
+  totalTimerSec?: number | null;
+  /** Sum of `total_elapsed_time` from session messages. */
+  totalElapsedSec?: number | null;
+  /** Pre-computed by the device (we still recompute, but display for reference). */
+  deviceAvgPower?: number | null;
+  deviceNormalizedPower?: number | null;
+  deviceTotalDistanceM?: number | null;
+  deviceTotalAscentM?: number | null;
+  deviceCalories?: number | null;
+};
+
+export type ParsedRide = {
+  samples: RideSamples;
+  fit?: FitContext;
+  format: "fit" | "csv" | "unknown";
+};
+
+/** FIT records use signed int32 semicircles - convert to decimal degrees. */
+function semicirclesToDegrees(sc: number): number {
+  return sc * (180 / 2 ** 31);
+}
+
+/**
+ * Robust FIT decoder built on `fit-file-parser`.
+ * Returns ride samples + session/device context for richer analytics.
+ * Throws an Error (with a user-facing message) if the file is not a valid FIT.
+ */
+async function parseFit(buf: Buffer): Promise<ParsedRide> {
+  if (buf.length < 14 || buf.slice(8, 12).toString("ascii") !== ".FIT") {
+    throw new Error("INVALID_FIT_HEADER");
+  }
+
+  const parser = new FitParser({
+    force: true,
+    speedUnit: "m/s",
+    lengthUnit: "m",
+    temperatureUnit: "celsius",
+    elapsedRecordField: false,
+    mode: "list",
+  });
+
+  // The fit-file-parser default export is the class; use parseAsync.
+  const data = await parser.parseAsync(
+    // The lib accepts ArrayBuffer / Buffer; pass underlying bytes for safety.
+    buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer,
+  );
+
+  // fit-file-parser exports its own narrow types (ParsedRecord/ParsedSession
+  // etc.). For dynamic field access we go through `unknown` so TS doesn't
+  // demand an index signature on each generated interface.
+  const records = (Array.isArray(data?.records)
+    ? (data.records as unknown as Array<Record<string, unknown>>)
+    : []) as Array<Record<string, unknown>>;
+  const sessions = (Array.isArray(data?.sessions)
+    ? (data.sessions as unknown as Array<Record<string, unknown>>)
+    : []) as Array<Record<string, unknown>>;
+  const sports = (Array.isArray(data?.sports)
+    ? (data.sports as unknown as Array<Record<string, unknown>>)
+    : []) as Array<Record<string, unknown>>;
+  const deviceInfos = (Array.isArray(data?.device_infos)
+    ? (data.device_infos as unknown as Array<Record<string, unknown>>)
+    : []) as Array<Record<string, unknown>>;
+
   const samples: RideSamples = {
     t: [],
     power: [],
@@ -151,34 +223,116 @@ function parseFit(buf: Buffer): RideSamples {
     speedMps: [],
     distanceM: [],
     altitudeM: [],
+    latDeg: [],
+    lonDeg: [],
+    temperatureC: [],
   };
 
-  if (buf.length < 14) return samples;
-  // Verify the header magic (".FIT").
-  const sig = buf.slice(8, 12).toString("ascii");
-  if (sig !== ".FIT") return samples;
+  let firstTimeMs: number | null = null;
+  for (const rec of records) {
+    const ts = rec.timestamp;
+    let elapsed: number | null = null;
+    if (ts instanceof Date) {
+      const ms = ts.getTime();
+      if (firstTimeMs === null) firstTimeMs = ms;
+      elapsed = (ms - firstTimeMs) / 1000;
+    } else if (typeof ts === "number" && Number.isFinite(ts)) {
+      if (firstTimeMs === null) firstTimeMs = ts;
+      elapsed = (ts - firstTimeMs) / 1000;
+    } else {
+      elapsed = samples.t.length; // 1Hz fallback
+    }
+    samples.t.push(elapsed);
 
-  // We can't fully decode FIT without a dictionary. Inform caller via empty;
-  // upper layer will handle unknown-format gracefully.
-  return samples;
+    const num = (k: string): number | null => {
+      const v = rec[k];
+      return typeof v === "number" && Number.isFinite(v) ? v : null;
+    };
+
+    samples.power.push(num("power"));
+    samples.hr.push(num("heart_rate"));
+    samples.cadence.push(num("cadence"));
+
+    // Speed: prefer enhanced_speed; fallback to speed.
+    const spd = num("enhanced_speed") ?? num("speed");
+    samples.speedMps.push(spd);
+
+    samples.distanceM.push(num("distance"));
+
+    const alt = num("enhanced_altitude") ?? num("altitude");
+    samples.altitudeM.push(alt);
+
+    const lat = num("position_lat");
+    const lon = num("position_long");
+    // Many FIT devices encode positions in semicircles; also accept degrees if
+    // the library has already converted (when |value| <= 180).
+    samples.latDeg!.push(
+      lat == null ? null : Math.abs(lat) > 180 ? semicirclesToDegrees(lat) : lat,
+    );
+    samples.lonDeg!.push(
+      lon == null ? null : Math.abs(lon) > 180 ? semicirclesToDegrees(lon) : lon,
+    );
+    samples.temperatureC!.push(num("temperature"));
+  }
+
+  if (firstTimeMs !== null) samples.startTimeMs = firstTimeMs;
+
+  // Aggregate FitContext from session messages.
+  const ctx: FitContext = {};
+  if (sessions.length > 0) {
+    let timer = 0;
+    let elapsedSec = 0;
+    let dist = 0;
+    let ascent = 0;
+    let cal = 0;
+    let avgP: number | null = null;
+    let np: number | null = null;
+    for (const s of sessions) {
+      const sNum = (k: string) =>
+        typeof s[k] === "number" && Number.isFinite(s[k] as number)
+          ? (s[k] as number)
+          : null;
+      timer += sNum("total_timer_time") ?? 0;
+      elapsedSec += sNum("total_elapsed_time") ?? 0;
+      dist += sNum("total_distance") ?? 0;
+      ascent += sNum("total_ascent") ?? 0;
+      cal += sNum("total_calories") ?? 0;
+      if (avgP == null) avgP = sNum("avg_power");
+      if (np == null) np = sNum("normalized_power");
+      if (!ctx.sport && typeof s.sport === "string") ctx.sport = s.sport;
+      if (!ctx.subSport && typeof s.sub_sport === "string")
+        ctx.subSport = s.sub_sport;
+      const sStart = s.start_time;
+      if (sStart instanceof Date && ctx.startTimeMs == null) {
+        ctx.startTimeMs = sStart.getTime();
+      }
+    }
+    ctx.totalTimerSec = timer || null;
+    ctx.totalElapsedSec = elapsedSec || null;
+    ctx.deviceTotalDistanceM = dist || null;
+    ctx.deviceTotalAscentM = ascent || null;
+    ctx.deviceCalories = cal || null;
+    ctx.deviceAvgPower = avgP;
+    ctx.deviceNormalizedPower = np;
+  }
+  if (!ctx.sport && sports[0] && typeof sports[0].sport === "string") {
+    ctx.sport = sports[0].sport as string;
+  }
+  if (deviceInfos[0]) {
+    const di = deviceInfos[0];
+    const manuf = typeof di.manufacturer === "string" ? di.manufacturer : "";
+    const prod = typeof di.product_name === "string" ? (di.product_name as string) : "";
+    const label = [manuf, prod].filter(Boolean).join(" ").trim();
+    if (label) ctx.device = label;
+  }
+  if (ctx.startTimeMs == null && firstTimeMs != null) ctx.startTimeMs = firstTimeMs;
+
+  return { samples, fit: ctx, format: "fit" };
 }
 
-export function parseRideFile(
-  fileName: string,
-  data: Buffer,
-): RideSamples {
-  const lower = fileName.toLowerCase();
-  if (lower.endsWith(".csv") || lower.endsWith(".txt")) {
-    return parseCsv(data.toString("utf8"));
-  }
-  if (lower.endsWith(".fit")) {
-    return parseFit(data);
-  }
-  // Try CSV by default
-  try {
-    return parseCsv(data.toString("utf8"));
-  } catch {
-    return {
+function emptyParsedRide(format: ParsedRide["format"] = "unknown"): ParsedRide {
+  return {
+    samples: {
       t: [],
       power: [],
       hr: [],
@@ -186,8 +340,52 @@ export function parseRideFile(
       speedMps: [],
       distanceM: [],
       altitudeM: [],
-    };
+      latDeg: [],
+      lonDeg: [],
+      temperatureC: [],
+    },
+    format,
+  };
+}
+
+/**
+ * Detect file format and dispatch to the correct decoder.
+ * - FIT is detected by extension OR `.FIT` magic bytes at offset 8.
+ * - CSV / TXT are decoded via the legacy text parser.
+ */
+export async function parseRideFile(
+  fileName: string,
+  data: Buffer,
+): Promise<ParsedRide> {
+  const lower = fileName.toLowerCase();
+
+  const looksLikeFit =
+    lower.endsWith(".fit") ||
+    (data.length >= 14 && data.slice(8, 12).toString("ascii") === ".FIT");
+
+  if (looksLikeFit) {
+    try {
+      return await parseFit(data);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new Error(`FIT_PARSE_FAILED: ${msg}`);
+    }
   }
+
+  if (lower.endsWith(".csv") || lower.endsWith(".txt")) {
+    return { samples: parseCsv(data.toString("utf8")), format: "csv" };
+  }
+
+  // Last-resort: try CSV decoding.
+  try {
+    const samples = parseCsv(data.toString("utf8"));
+    if (samples.t.length > 0) {
+      return { samples, format: "csv" };
+    }
+  } catch {
+    // fall through
+  }
+  return emptyParsedRide("unknown");
 }
 
 /**
